@@ -10,7 +10,11 @@ Welcome to SoftDev's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+.. automodule:: softdev.epics
+   :members:
 
+.. automodule:: softdev.models
+   :members:   
 
 Indices and tables
 ==================

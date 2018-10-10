@@ -33,6 +33,230 @@
 <h1>Welcome to SoftDev’s documentation!<a class="headerlink" href="#welcome-to-softdev-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<span class="target" id="module-softdev.epics"></span><dl class="class">
+<dt id="softdev.epics.BasePV">
+<em class="property">class </em><code class="descclassname">softdev.epics.</code><code class="descname">BasePV</code><span class="sig-paren">(</span><em>name</em>, <em>monitor=True</em>, <em>timed=False</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.BasePV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process Variable Base Class</p>
+<dl class="method">
+<dt id="softdev.epics.BasePV.set_state">
+<code class="descname">set_state</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.BasePV.set_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set and emit signals for the current state. Only specified states will be set
+:param kwargs: keywords correspond to signal names, values are signal values to emit
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.epics.PV">
+<em class="property">class </em><code class="descclassname">softdev.epics.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>name</em>, <em>monitor=True</em>, <em>timed=False</em>, <em>connect=False</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Process Variable</p>
+<p>A PV encapsulates an EPICS Process Variable.</p>
+<p>The primary interface methods for a pv are to get() and set()/put() its
+value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="n">pv_name</span><span class="p">)</span>    <span class="c1"># create a pv object given a pv name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>            <span class="c1"># get pv value</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>         <span class="c1"># set pv to specified value.</span>
+</pre></div>
+</div>
+<p>Additional important attributes include:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">name</span>             <span class="c1"># name of pv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">count</span>            <span class="c1"># number of elements in array pvs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">type</span>             <span class="c1"># EPICS data type</span>
+</pre></div>
+</div>
+<p>A pv uses Channel Access monitors to improve efficiency and minimize
+network traffic, so that calls to get() fetches the cached value,
+which is automatically updated.</p>
+<p>Note that GObject, derived features are available only when a GObject
+or compatible main-loop is running.</p>
+<p>In order to communicate with the corresponding channel on the IOC, a PV
+needs to “connect”.  This creates a dedicated connection to the IOC on which
+the PV lives, and creates resources for the PV. A Python PV object cannot
+actually do anything to the PV on the IOC until it is connected.</p>
+<p>Connection is a two-step process.  First a local PV is “created” in local
+memory. This happens very quickly, and happens automatically when a PV is
+initialized (and has a pvname).</p>
+<p>Second, connection is completed with network communication to the IOC. This
+is necessary to determine the PV “type” (that is, integer, double, string,
+enum, etc) and “count” (that is, whether it holds an array of values) that
+are needed to allocate resources on the client machine.  Again, this
+connection is not instantaneous but must happen before you can do anything
+useful with the PV.</p>
+<dl class="method">
+<dt id="softdev.epics.PV.add_monitor">
+<code class="descname">add_monitor</code><span class="sig-paren">(</span><em>callback</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.add_monitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback function to be called every time a change occurs. Mostly used internally.
+External users should use the ‘changed’ and ‘time’ signals and the ‘connect’ method</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.create_connection">
+<code class="descname">create_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.create_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to create a connection synchronously. If not successful, defer it asynchronously</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.defer_connection">
+<code class="descname">defer_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.defer_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a connection asynchronously</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.del_monitor">
+<code class="descname">del_monitor</code><span class="sig-paren">(</span><em>event_id</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.del_monitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a monitor by id
+:param event_id: monitor id to remove
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.from_python">
+<code class="descname">from_python</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.from_python" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert python value to data suitable for Channel Access
+:param val: python value
+:return: Channel Access data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.get">
+<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a Process Variable.
+If monitoring is enabled, this returns the most recently update value,
+without issuing any new channel access calls.</p>
+<dl class="docutils">
+<dt>Array Types:</dt>
+<dd><ul class="first last simple">
+<li>Character arrays and strings are equivalent. The return value is
+a string.</li>
+<li>All other array types will return a numpy.ndarray</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.get_parameters">
+<code class="descname">get_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get control parameters of a Process Variable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.is_connected">
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the channel is active</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.on_change">
+<code class="descname">on_change</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.on_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for handling change event of Process Variables
+:param event: CA Event record
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.on_connect">
+<code class="descname">on_connect</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.on_connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called every time a connection is successful
+:param event:  connection event
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>val</em>, <em>flush=False</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the value of the process variable, waiting for up to 0.05 sec until
+the put is complete.
+:param val: Value to Put
+:param flush: boolean, if True, flush the channel before returning
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>val</em>, <em>flush=False</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the value of the process variable, waiting for up to 0.05 sec until
+the put is complete.
+:param val: Value to Put
+:param flush: boolean, if True, flush the channel before returning
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.to_python">
+<code class="descname">to_python</code><span class="sig-paren">(</span><em>ca_value</em>, <em>ca_type</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.to_python" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert EPICS value to python representation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ca_value</strong> – Channel Access data from Get and Monitor</li>
+<li><strong>ca_type</strong> – Channel Type</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">python friendly value</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.epics.PV.toggle">
+<code class="descname">toggle</code><span class="sig-paren">(</span><em>val1</em>, <em>val2</em>, <em>delay=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.epics.PV.toggle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rapidly switch between two values with a maximum delay between.
+:param val1: First Value
+:param val2: Second Value
+:param delay: Delay
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-softdev.models"></span><dl class="class">
+<dt id="softdev.models.Model">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>device_name</em>, <em>callbacks=None</em>, <em>command='softIoc'</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>IOC Database Model.</p>
+<p>SubClasses should define record attributes at the top-level of the class declaration for example:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>class MyIOC(Mode):</dt>
+<dd>pv1 = Integer(‘pv1’, desc=’Test Integer PV’)
+pv1 = Integer(‘pv1’, desc=’Test Integer PV’)</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="softdev.models.Model.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the ioc records an connect all callbacks
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.models.Model.start_ioc">
+<code class="descname">start_ioc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model.start_ioc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the database and start the IOC application in a separate process
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="softdev.models.Model.stop_ioc">
+<code class="descname">stop_ioc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model.stop_ioc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shutdown the ioc application
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.RecordType">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">RecordType</code><a class="headerlink" href="#softdev.models.RecordType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record MetaClass</p>
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>

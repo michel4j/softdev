@@ -369,18 +369,13 @@ class PV(BasePV):
 
     def put(self, val, flush=False):
         """
-        Set the value of the process variable, waiting for up to 1 sec until
+        Set the value of the process variable, waiting for up to 0.05 sec until
         the put is complete.
-        Array Types:
-            - Character arrays and strings are equivalent, except strings are fixed size.
-              They both expect a string value. Longer strings will be truncated
-            - All other array types expect a list, tuple, numpy.ndarray or array.array
-              values containing an appropriate type. Longer sequences will be truncated.
-              If a single non-sequence value is given, the first element of the
-              array will be set to the value and the rest will be set to zero. If a
-              sequence smaller than the element count is given, the rest of the values
-              will be set to zero.
+        :param val: Value to Put
+        :param flush: boolean, if True, flush the channel before returning
+        :return:
         """
+
         if not self.is_connected():
             logger.error('(%s) PV not connected' % (self.name,))
             return
@@ -389,18 +384,30 @@ class PV(BasePV):
         libca.ca_array_put(self.type, self.count, self.chid, byref(data))
         libca.ca_pend_io(0.05)
         libca.ca_pend_event(1e-4)
+        if flush:
+            flush()
 
     # provide a put method for those used to EPICS terminology
     set = put
 
     def toggle(self, val1, val2, delay=0.001):
-        """Rapidly switch between two values with a maximum delay between."""
+        """
+        Rapidly switch between two values with a maximum delay between.
+        :param val1: First Value
+        :param val2: Second Value
+        :param delay: Delay
+        :return:
+        """
         self.set(val1)
         libca.ca_pend_event(delay)
         self.set(val2)
 
     def from_python(self, val):
-        # convert enums if string is provided instead of short
+        """
+        Convert python value to data suitable for Channel Access
+        :param val: python value
+        :return: Channel Access data
+        """
         if isinstance(val, str) and self.type == DBR_ENUM:
             if not self.params:
                 self.params = self.get_parameters()
@@ -429,9 +436,10 @@ class PV(BasePV):
     def to_python(self, ca_value, ca_type):
         """
         Convert EPICS value to python representation
-        @param raw: Channel Access data from Get and Monitor
-        @param ca_type: Channel Type
-        @return: python friendly value
+
+        :param ca_value: Channel Access data from Get and Monitor
+        :param ca_type: Channel Type
+        :return: python friendly value
         """
         if ca_type in [DBR_STRING, DBR_TIME_STRING, DBR_CTRL_STRING]:
             if self.count > 1:
@@ -448,7 +456,11 @@ class PV(BasePV):
         return val
 
     def on_change(self, event):
-        """Process a change event from the IOC"""
+        """
+        Callback for handling change event of Process Variables
+        :param event: CA Event record
+        :return:
+        """
         if self.chid != event.chid or event.type != self.ttype:
             return 0
 

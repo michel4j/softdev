@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>SoftDev &mdash; SoftDev 0.2.0 documentation</title>
+  <title>SoftDev &mdash; SoftDev 0.2.7 documentation</title>
   
 
   
@@ -55,6 +55,10 @@
 
           
             
+            
+              <div class="version">
+                v0.2.7
+              </div>
             
           
 
@@ -241,7 +245,7 @@ from <strong>softioc.models.Model</strong> and declare database records using th
 </div>
 <dl class="class">
 <dt id="softdev.models.Model">
-<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>device_name</em>, <em>callbacks=None</em>, <em>command='softIoc'</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>device_name</em>, <em>callbacks=None</em>, <em>command='softIoc'</em>, <em>macros=None</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model" title="Permalink to this definition">¶</a></dt>
 <dd><p>IOC Database Model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -251,6 +255,7 @@ from <strong>softioc.models.Model</strong> and declare database records using th
 <li><strong>device_name</strong> – Root Name of device</li>
 <li><strong>callbacks</strong> – Callback handler which provides callback methods for handling events and commands</li>
 <li><strong>command</strong> – The softIoc command to execute. By default this is ‘softIoc’ from EPICS base.</li>
+<li><strong>macros</strong> – additional macros to be used in the database as a dictionary</li>
 </ul>
 </td>
 </tr>
@@ -363,7 +368,7 @@ field.</p>
 are currently supported:</p>
 <dl class="class">
 <dt id="softdev.models.Record">
-<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Record</code><span class="sig-paren">(</span><em>name</em>, <em>desc=None</em>, <em>raw=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Record" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Record</code><span class="sig-paren">(</span><em>name</em>, <em>desc=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all record types. Do not use directly.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -372,7 +377,6 @@ are currently supported:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> – Record name (str)</li>
 <li><strong>desc</strong> – Description (str)</li>
-<li><strong>raw</strong> – (bool) whether to use raw soft channel or soft channel</li>
 <li><strong>kwargs</strong> – additional keyword arguments</li>
 </ul>
 </td>
@@ -446,7 +450,7 @@ are currently supported:</p>
 
 <dl class="class">
 <dt id="softdev.models.Float">
-<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Float</code><span class="sig-paren">(</span><em>name</em>, <em>max_val=10000000000.0</em>, <em>min_val=-10000000000.0</em>, <em>default=0.0</em>, <em>prec=4</em>, <em>units=''</em>, <em>raw=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Float" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Float</code><span class="sig-paren">(</span><em>name</em>, <em>max_val=10000000000.0</em>, <em>min_val=-10000000000.0</em>, <em>default=0.0</em>, <em>prec=4</em>, <em>units=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Float" title="Permalink to this definition">¶</a></dt>
 <dd><p>Float Record.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -589,7 +593,7 @@ are currently supported:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2.0',
+            VERSION:'0.2.7',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

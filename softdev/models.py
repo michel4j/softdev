@@ -36,17 +36,15 @@ class Record(object):
     required = ['name', 'desc']
     record = 'ai'
     fields = {
-        'DTYP': '{channel}',
         'DESC': '{desc}',
     }
 
-    def __init__(self, name, desc=None, raw=False, **kwargs):
+    def __init__(self, name, desc=None, **kwargs):
         """
         Base class for all record types. Do not use directly.
 
         :param name: Record name (str)
         :param desc: Description (str)
-        :param raw: (bool) whether to use raw soft channel or soft channel
         :param kwargs: additional keyword arguments
         """
         kwargs.update(name=name, desc=desc)
@@ -54,7 +52,6 @@ class Record(object):
         self.options = {}
         self.options.update(kw)
         self.options['record'] = self.record
-        self.options['channel'] = 'Soft Channel' if not raw else 'Raw Soft Channel'
         self.instance_fields = {}
         self.instance_fields.update(self.fields)
         missing_args = set(self.required) - set(self.options.keys())
@@ -200,7 +197,7 @@ class Float(Record):
         'VAL': '{default}'
     }
 
-    def __init__(self, name, max_val=1e10, min_val=-1e10, default=0.0, prec=4, units='', raw=True, **kwargs):
+    def __init__(self, name, max_val=1e10, min_val=-1e10, default=0.0, prec=4, units='', **kwargs):
         """
         Float Record.
 
@@ -212,7 +209,7 @@ class Float(Record):
         :param units:  engineering units (str), default empty string
         :param kwargs: Extra keyword arguments
         """
-        kwargs.update(max_val=max_val, min_val=min_val, default=default, prec=prec, raw=raw, units=units)
+        kwargs.update(max_val=max_val, min_val=min_val, default=default, prec=prec, units=units)
         super(Float, self).__init__(name, **kwargs)
 
 

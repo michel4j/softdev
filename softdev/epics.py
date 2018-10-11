@@ -367,7 +367,7 @@ class PV(BasePV):
                     params[_k] = v
             return params
 
-    def put(self, val, flush=False):
+    def put(self, val, wait=False):
         """
         Set the value of the process variable, waiting for up to 0.05 sec until
         the put is complete.
@@ -384,7 +384,7 @@ class PV(BasePV):
         libca.ca_array_put(self.type, self.count, self.chid, byref(data))
         libca.ca_pend_io(0.05)
         libca.ca_pend_event(1e-4)
-        if flush:
+        if wait:
             flush()
 
     # provide a put method for those used to EPICS terminology

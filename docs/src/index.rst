@@ -58,6 +58,7 @@ Your IOC application can be structured at will although we recommend the followi
    │   └── runOpCtrl    # Command to run Operator Display Application
    ├── op               # Directory containing Operator Display screens
    └── myioc            # Python package for your IOC Application and all other supporting modules
+       ├── __init__.py
        └── ioc.py       # IOC module containing your IOC application
 
 Indices and tables

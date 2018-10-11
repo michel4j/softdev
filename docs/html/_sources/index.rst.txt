@@ -43,7 +43,7 @@ dependencies are available.
 
 ::
 
-   $ python -m unittest -v tests.ioc_tests
+   $ python -m unittest -v test.test_ioc.py
 
 
 Write your first IOC
@@ -82,7 +82,7 @@ For example:
 
 .. code-block:: python
 
-   from softioc import models
+   from softdev import models
 
    class MyIOC(models.Model):
        enum = models.Enum('enum', choices=['ZERO', 'ONE', 'TWO'], default=0, desc='Enum Test')
@@ -173,7 +173,7 @@ The script **bin/runIOC.py** is responsible for running the IOC Application. An 
    gireactor.install()
    from twisted.internet import reactor
 
-   # add the project to the python path and inportt it
+   # add the project to the python path and inport it
    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
    from softdev import log
    from myioc import ioc

@@ -183,7 +183,7 @@ can interact within the same application. We recommend not using <cite>pyepics</
 </div>
 <p>Once it is installed, you can run the tests to make sure your system is properly _setup, and all required
 dependencies are available.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m unittest -v tests.ioc_tests
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m unittest -v test.test_ioc.py
 </pre></div>
 </div>
 </div>
@@ -212,7 +212,7 @@ will have to create yourself based on your preferred EPICS display manager.</p>
 <p>If you are familar with the Django Framework, the IOC model should feel natural. All IOC models should inherit
 from <strong>softioc.models.Model</strong> and declare database records using the record types defined in <strong>softioc.models</strong>.</p>
 <p>For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">softioc</span> <span class="kn">import</span> <span class="n">models</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">softdev</span> <span class="kn">import</span> <span class="n">models</span>
 
 <span class="k">class</span> <span class="nc">MyIOC</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">enum</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;enum&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ZERO&#39;</span><span class="p">,</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Enum Test&#39;</span><span class="p">)</span>
@@ -329,7 +329,7 @@ field.</p>
 <span class="n">gireactor</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
 <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">reactor</span>
 
-<span class="c1"># add the project to the python path and inportt it</span>
+<span class="c1"># add the project to the python path and inport it</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))))</span>
 <span class="kn">from</span> <span class="nn">softdev</span> <span class="kn">import</span> <span class="n">log</span>
 <span class="kn">from</span> <span class="nn">myioc</span> <span class="kn">import</span> <span class="n">ioc</span>

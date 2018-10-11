@@ -292,7 +292,7 @@ class Array(Record):
 
 CMD_TEMPLATE = """
 ## Load record instances
-dbLoadRecords {db_name}.db, {macros}
+dbLoadRecords("{db_name}.db", "{macros}")
 iocInit()
 dbl
 """
@@ -359,7 +359,7 @@ class Model(object):
                 db_file.write(str(v))
 
         with open(os.path.join(self.db_cache_dir, '{}.cmd'.format(db_name)), 'w') as cmd_file:
-            macro_text = ', '.join(['{}={}'.format(k,v) for k,v in self.macros.items()])
+            macro_text = ','.join(['{}={}'.format(k,v) for k,v in self.macros.items()])
 
 
             cmd_file.write(CMD_TEMPLATE.format(macros=macro_text, db_name=db_name))

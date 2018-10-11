@@ -43,7 +43,7 @@ dependencies are available.
 
 ::
 
-   $ python -m unittest -v tests.ioc_tests
+   $ python -m unittest -v test.test_ioc.py
 
 
 Write your first IOC

@@ -49,7 +49,7 @@ class IOCTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.ioc.stop_ioc()
+        cls.ioc.shutdown()
 
     def test_enum(self):
         val = 1

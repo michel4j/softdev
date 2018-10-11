@@ -343,10 +343,10 @@ class Model(object):
         self.command = command
         self.ready = False
         self.db_cache_dir = os.path.join(os.path.join(os.getcwd(), '__dbcache__'))
-        self.start_ioc()
+        self.startup()
         self.setup()
 
-    def start_ioc(self):
+    def startup(self):
         """
         Generate the database and start the IOC application in a separate process
         :return:
@@ -369,7 +369,7 @@ class Model(object):
         self.ioc_process.daemon = True
         self.ioc_process.start()
 
-    def stop_ioc(self):
+    def shutdown(self):
         """
         Shutdown the ioc application
         :return:

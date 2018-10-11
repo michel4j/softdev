@@ -29,8 +29,11 @@ if __name__== '__main__':
         log.log_to_console(logging.DEBUG)
     else:
         log.log_to_console(logging.INFO)
-    app = ioc.{app_name}('APP0000-01')  # initialize App
-    reactor.run()               # run main-loop
+    try:
+        app = ioc.{app_name}('APP0000-01')  # initialize App
+        reactor.run()               # run main-loop
+    except KeyboardInterrupt:
+        app.shutdown()
 
 """
 
@@ -60,7 +63,7 @@ class {app_name}(object):
     
     def do_toggle(self, pv, value, ioc):
         print('Toggle Changed Value', pv, value, ioc)
-        ioc.enum.put((ioc.enum.get() + 1) % 3, flush=True)  # cycle through values
+        ioc.enum.put((ioc.enum.get() + 1) % 3, wait=True)  # cycle through values
     
     def do_enum(self, pv, value, ioc):
         print('New Enum Value', value)

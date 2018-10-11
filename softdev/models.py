@@ -295,7 +295,7 @@ class Array(Record):
 
 CMD_TEMPLATE = """
 ## Load record instances
-dbLoadRecords {db_name}.db, device={device_name}
+dbLoadRecords {db_name}.db, {macros}
 iocInit()
 dbl
 """
@@ -315,13 +315,14 @@ class ModelType(type):
 class Model(object):
     __metaclass__ = ModelType
 
-    def __init__(self, device_name, callbacks=None, command='softIoc'):
+    def __init__(self, device_name, callbacks=None, command='softIoc', macros=None):
         """
         IOC Database Model
 
         :param device_name:  Root Name of device
         :param callbacks: Callback handler which provides callback methods for handling events and commands
         :param command: The softIoc command to execute. By default this is 'softIoc' from EPICS base.
+        :param macros: additional macros to be used in the database as a dictionary
 
         Process Variable records will be named *<device_name>:<record_name>*.
 
@@ -340,6 +341,9 @@ class Model(object):
         self.device_name = device_name
         self.callbacks = callbacks or self
         self.ioc_process = None
+        self.macros = {'device': self.device_name}
+        if isinstance(macros, dict):
+            self.macros.update(**macros)
         self.command = command
         self.ready = False
         self.db_cache_dir = os.path.join(os.path.join(os.getcwd(), '__dbcache__'))
@@ -358,7 +362,10 @@ class Model(object):
                 db_file.write(str(v))
 
         with open(os.path.join(self.db_cache_dir, '{}.cmd'.format(db_name)), 'w') as cmd_file:
-            cmd_file.write(CMD_TEMPLATE.format(device_name=self.device_name, db_name=db_name))
+            macro_text = ','.join(['{}={}'.format(k,v) for k,v in self.macros.items()])
+
+
+            cmd_file.write(CMD_TEMPLATE.format(macros=macro_text, db_name=db_name))
         os.chdir(self.db_cache_dir)
         self.ioc_process = multiprocessing.Process(
             target=subprocess.check_call,

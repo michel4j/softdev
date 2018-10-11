@@ -42,7 +42,8 @@ class Record(object):
 
     def __init__(self, name, desc=None, raw=False, **kwargs):
         """
-        Base class for all record types
+        Base class for all record types. Do not use directly.
+
         :param name: Record name (str)
         :param desc: Description (str)
         :param raw: (bool) whether to use raw soft channel or soft channel
@@ -71,6 +72,7 @@ class Record(object):
     def add_field(self, key, value):
         """
         Add a database record field
+
         :param key: field name
         :param value: field value
         :return:
@@ -80,8 +82,8 @@ class Record(object):
     def del_field(self, key):
         """
         Delete a database record field
+
         :param key: field name
-        :return:
         """
         if key in self.instance_fields:
             del self.instance_fields[key]
@@ -97,6 +99,7 @@ class Enum(Record):
     def __init__(self, name, choices=None, default=0, **kwargs):
         """
         Enum record type
+
         :param name: Record name (str)
         :param choices: list/tuple of strings corresponding to the choice names, values will be 0-index integers
         :param default: default value of the record, 0 by default
@@ -144,6 +147,7 @@ class String(Record):
     def __init__(self, name, max_length=20, default='', **kwargs):
         """
         String record. Uses standard string record, or character array depending on length
+
         :param name: Record name (str)
         :param max_length: maximum number of characters expected
         :param default:  default value, empty string by default
@@ -309,33 +313,29 @@ class ModelType(type):
 
 
 class Model(object):
-    """
-    IOC Database Model.
-
-    SubClasses should define record attributes at the top-level of the class declaration for example:
-
-        class MyIOC(Mode):
-            pv1 = Integer('pv1', desc='Test Integer PV')
-            pv1 = Integer('pv1', desc='Test Integer PV')
-    """
     __metaclass__ = ModelType
 
     def __init__(self, device_name, callbacks=None, command='softIoc'):
         """
-        IOC Database Model Instance
-        :param device_name:  Root Name of device, process variable records will be named '<device_name>:<record_name>'
-        :param callbacks: Object which provides callback methods for handling events and commands, if not provided,
-            it is assumed that all callbacks are defined within the model itself. The expected callback methods
-            should follow the signature:
+        IOC Database Model
 
-                def do_<record_name>(self, pv, value, ioc)
+        :param device_name:  Root Name of device
+        :param callbacks: Callback handler which provides callback methods for handling events and commands
+        :param command: The softIoc command to execute. By default this is 'softIoc' from EPICS base.
 
-            which accepts the active record (pv), the changed value (value) and the ioc instance (ioc).
+        Process Variable records will be named *<device_name>:<record_name>*.
 
-            If the Model is also the callbacks provider, self, and ioc are identical, otherwise ioc is a reference
-            to the database model on which the record resides.
-        :param command: The softIoc command to execute. By default this is 'softIoc' from EPICS base. For example you
-            could chose to use xxx from synApps.
+        If Callback Handler is not provided, it is assumed that all callbacks are defined within the model itself.
+        The expected callback methods must follow the signature:
+
+        .. code-block:: python
+
+            def do_<record_name>(self, pv, value, ioc):
+                ...
+
+        which accepts the active record (pv), the changed value (value) and the ioc instance (ioc). If the Model
+        is also the callbacks provider, self, and ioc are identical, otherwise ioc is a reference to the database
+        model on which the record resides.
         """
         self.device_name = device_name
         self.callbacks = callbacks or self
@@ -343,13 +343,12 @@ class Model(object):
         self.command = command
         self.ready = False
         self.db_cache_dir = os.path.join(os.path.join(os.getcwd(), '__dbcache__'))
-        self.startup()
-        self.setup()
+        self._startup()
+        self._setup()
 
-    def startup(self):
+    def _startup(self):
         """
         Generate the database and start the IOC application in a separate process
-        :return:
         """
         if not os.path.exists(self.db_cache_dir):
             os.mkdir(self.db_cache_dir)
@@ -372,15 +371,13 @@ class Model(object):
     def shutdown(self):
         """
         Shutdown the ioc application
-        :return:
         """
         self.ioc_process.terminate()
         shutil.rmtree(self.db_cache_dir)
 
-    def setup(self):
+    def _setup(self):
         """
         Set up the ioc records an connect all callbacks
-        :return:
         """
         pending = set()
         for k, f in self._fields.items():

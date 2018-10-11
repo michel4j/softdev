@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to SoftDev’s documentation! &mdash; SoftDev 0.2.0 documentation</title>
+  <title>SoftDev &mdash; SoftDev 0.2.0 documentation</title>
   
 
   
@@ -79,10 +79,14 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to SoftDev’s documentation!</a></li>
+<li><a class="reference internal" href="#">SoftDev</a></li>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
 <li><a class="reference internal" href="#write-your-first-ioc">Write your first IOC</a></li>
+<li><a class="reference internal" href="#creating-the-ioc-model">Creating the IOC Model</a></li>
+<li><a class="reference internal" href="#creating-the-ioc-application">Creating the IOC Application</a></li>
+<li><a class="reference internal" href="#running-the-ioc-application">Running the IOC Application</a></li>
+<li><a class="reference internal" href="#record-types">Record Types</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
@@ -129,7 +133,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to SoftDev’s documentation!</li>
+      <li>SoftDev</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -148,8 +152,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-softdev-s-documentation">
-<h1>Welcome to SoftDev’s documentation!<a class="headerlink" href="#welcome-to-softdev-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="softdev">
+<h1>SoftDev<a class="headerlink" href="#softdev" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 </div>
@@ -158,9 +162,9 @@
 <p>SoftDev is a package which enables python based EPICS IOC Soft Device support all within python. It
 allows you to define the IOC database model in a manner similar to Django Database models, and to use
 the model to develop dynamic, IOC servers.</p>
-<p>It includes a python ctypes based EPICS Channel Access interface based on <cite>pygobject</cite>. For use the
+<p>It includes a python ctypes based EPICS Channel Access interface based on <cite>PyGObject</cite>. For use the
 full capabilities, it is is highly recommended to use a GObject compatible main loop, such as the
-one provided by <cite>pygobject</cite> or even better, the GObject compatible <cite>Twisted</cite> reactor.</p>
+one provided by <cite>PyGObject</cite> or even better, the GObject compatible <cite>Twisted</cite> reactor.</p>
 <p>This library has been used to support very complex network IOC devices with non-trivial communication
 protocols. It works!</p>
 </div>
@@ -169,7 +173,15 @@ protocols. It works!</p>
 <p>Before you can use SoftDev, you’ll need to install it. It is a pure python module, although it requires
 <a class="reference external" href="https://pypi.org/project/PyGObject/">PyGObject</a> and <a class="reference external" href="https://pypi.org/project/numpy/">Numpy</a> to be available.
 <a class="reference external" href="https://pypi.org/project/Twisted/">Twisted</a>  is also highly recommended.</p>
-<p>Once it is installed, you can run the tests to make sure your system is properly setup, and all required
+<p>SoftDev Also requires a fully functional <a class="reference external" href="https://epics.anl.gov/base/index.php">EPICS Base</a> installation. If you haven’t so yet,
+please build and install EPICS Base. It has been tested with EPICS Base versions 3.14 to 3.16.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">SoftDev does not use <a class="reference external" href="https://pypi.org/project/pyepics/">pyepics</a>. It includes a python module for accessing EPICS Channel Access. It is not
+trivial to replace the built-in EPICS support with <cite>pyepics</cite>. It is uncertain how well both libraries will
+can interact within the same application. We recommend not using <cite>pyepics</cite> within your SoftDev IOC application.</p>
+</div>
+<p>Once it is installed, you can run the tests to make sure your system is properly _setup, and all required
 dependencies are available.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m unittest -v tests.ioc_tests
 </pre></div>
@@ -180,12 +192,360 @@ dependencies are available.</p>
 <p>Your IOC application can be structured at will although we recommend the following directory template</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>myioc
 ├── bin
-│   ├── runIOC       # Command to run IOC Application
+│   ├── runIOC.py    # Command to run IOC Application
 │   └── runOpCtrl    # Command to run Operator Display Application
 ├── op               # Directory containing Operator Display screens
-└── ioc              # Python package for your IOC Application
+└── myioc            # Python package for your IOC Application and all other supporting modules
+    ├── __init__.py
+    └── ioc.py       # IOC module containing your IOC application
 </pre></div>
 </div>
+<p>A program is included to create a default IOC project.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ softdev-startproject myioc
+</pre></div>
+</div>
+<p>That will create a directory structure similar to the one listed above, except the <cite>runOpCtrl</cite> file which you
+will have to create yourself based on your preferred EPICS display manager.</p>
+</div>
+<div class="section" id="creating-the-ioc-model">
+<h1>Creating the IOC Model<a class="headerlink" href="#creating-the-ioc-model" title="Permalink to this headline">¶</a></h1>
+<p>If you are familar with the Django Framework, the IOC model should feel natural. All IOC models should inherit
+from <strong>softioc.models.Model</strong> and declare database records using the record types defined in <strong>softioc.models</strong>.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">softioc</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">MyIOC</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">enum</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;enum&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ZERO&#39;</span><span class="p">,</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Enum Test&#39;</span><span class="p">)</span>
+    <span class="n">toggle</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Toggle</span><span class="p">(</span><span class="s1">&#39;toggle&#39;</span><span class="p">,</span> <span class="n">zname</span><span class="o">=</span><span class="s1">&#39;ON&#39;</span><span class="p">,</span> <span class="n">oname</span><span class="o">=</span><span class="s1">&#39;OFF&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Toggle Test&#39;</span><span class="p">)</span>
+    <span class="n">sstring</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="s1">&#39;sstring&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Short String Test&#39;</span><span class="p">)</span>
+    <span class="n">lstring</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="s1">&#39;lstring&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Long String Test&#39;</span><span class="p">)</span>
+    <span class="n">intval</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Integer</span><span class="p">(</span><span class="s1">&#39;intval&#39;</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=-</span><span class="mi">1000</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Int Test&#39;</span><span class="p">)</span>
+    <span class="n">floatval</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span>
+        <span class="s1">&#39;floatval&#39;</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">prec</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Float Test&#39;</span>
+    <span class="p">)</span>
+    <span class="n">floatout</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="s1">&#39;floatout&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Test Float Output&#39;</span><span class="p">)</span>
+    <span class="n">intarray</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="s1">&#39;intarray&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Int Array Test&#39;</span><span class="p">)</span>
+    <span class="n">floatarray</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="s1">&#39;floatarray&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Float Array Test&#39;</span><span class="p">)</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Calc</span><span class="p">(</span>
+        <span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">calc</span><span class="o">=</span><span class="s1">&#39;A+B&#39;</span><span class="p">,</span>
+        <span class="n">inpa</span><span class="o">=</span><span class="s1">&#39;$(device):intval CP NMS&#39;</span><span class="p">,</span>
+        <span class="n">inpb</span><span class="o">=</span><span class="s1">&#39;$(device):floatval CP NMS&#39;</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Calc Test&#39;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Once the model is defined, it can then be instanciated within the application. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ioc</span> <span class="o">=</span> <span class="n">MyIOC</span><span class="p">(</span><span class="s1">&#39;MYIOC-001&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="softdev.models.Model">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>device_name</em>, <em>callbacks=None</em>, <em>command='softIoc'</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>IOC Database Model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>device_name</strong> – Root Name of device</li>
+<li><strong>callbacks</strong> – Callback handler which provides callback methods for handling events and commands</li>
+<li><strong>command</strong> – The softIoc command to execute. By default this is ‘softIoc’ from EPICS base.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Process Variable records will be named <em>&lt;device_name&gt;:&lt;record_name&gt;</em>.</p>
+<p>If Callback Handler is not provided, it is assumed that all callbacks are defined within the model itself.
+The expected callback methods must follow the signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">do_</span><span class="o">&lt;</span><span class="n">record_name</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ioc</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>which accepts the active record (pv), the changed value (value) and the ioc instance (ioc). If the Model
+is also the callbacks provider, self, and ioc are identical, otherwise ioc is a reference to the database
+model on which the record resides.</p>
+<dl class="method">
+<dt id="softdev.models.Model.shutdown">
+<code class="descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Model.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shutdown the ioc application</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>This will create an IOC database with Process variable fields <strong>MYIOC-001:enum, MYIOC-001:toggle, …</strong> etc, where
+the process variable name is generated based on the model name, and the field name.  Once instanciated, the IOC is ready
+to be used and alive on the Channel Access network. However, for more responsive applications, it is recommended to
+to create an IOC Application as well.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#record-types">Record Types</a> for detailed documentation about database records.</p>
+</div>
+</div>
+<div class="section" id="creating-the-ioc-application">
+<h1>Creating the IOC Application<a class="headerlink" href="#creating-the-ioc-application" title="Permalink to this headline">¶</a></h1>
+<p>The IOC Application manages the IOC database and should provide the logic for the application. This can include
+connecting to a device through a serial interface, over the network, handling commands from the model, processing and
+generating new values for the database fields, etc. The sky is the limit.</p>
+<p>For example, let us create an application which uses the model above and responds to changes to the <strong>MYIOC-001:toggle</strong>
+field.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyIOCApp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+ <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_name</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">ioc</span> <span class="o">=</span> <span class="n">MyIOC</span><span class="p">(</span><span class="n">device_name</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+
+ <span class="k">def</span> <span class="nf">do_toggle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ioc</span><span class="p">):</span>
+     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     I am called whenever the `toggle` record&#39;s value changes</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+     <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+         <span class="c1"># Command activated, value will return to 0 after some time</span>
+         <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Toggle Changed Value&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+         <span class="n">ioc</span><span class="o">.</span><span class="n">enum</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">ioc</span><span class="o">.</span><span class="n">enum</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c1"># cycle through values</span>
+
+ <span class="k">def</span> <span class="nf">do_enum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ioc</span><span class="p">):</span>
+     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;New Enum Value&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+ <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="c1"># needed for proper IOC shutdown</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">ioc</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This application is initialized with the IOC device name.</p>
+</div>
+<div class="section" id="running-the-ioc-application">
+<h1>Running the IOC Application<a class="headerlink" href="#running-the-ioc-application" title="Permalink to this headline">¶</a></h1>
+<p>The script <strong>bin/runIOC.py</strong> is responsible for running the IOC Application. An example script is generated by the
+<strong>softdev-startproject</strong> command. It can be modified to suit your needs. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+<span class="c1"># Twisted boiler-plate code.</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">gireactor</span>
+<span class="n">gireactor</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">reactor</span>
+
+<span class="c1"># add the project to the python path and inportt it</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))))</span>
+<span class="kn">from</span> <span class="nn">softdev</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">myioc</span> <span class="kn">import</span> <span class="n">ioc</span>
+
+<span class="c1"># Setup single argument for verbose logging</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run IOC Application&#39;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Verbose Logging&#39;</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">v</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">log_to_console</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">log_to_console</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="c1"># initialize App</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ioc</span><span class="o">.</span><span class="n">MyIOCApp</span><span class="p">(</span><span class="s1">&#39;APP0000-01&#39;</span><span class="p">)</span>
+
+    <span class="c1"># make sure app is properly shutdown</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">addSystemEventTrigger</span><span class="p">(</span><span class="s1">&#39;before&#39;</span><span class="p">,</span> <span class="s1">&#39;shutdown&#39;</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">shutdown</span><span class="p">)</span>
+
+    <span class="c1"># run main-loop</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This example uses the <a class="reference external" href="https://pypi.org/project/Twisted/">Twisted</a> framework. It is highly recommended to use it too.</p>
+</div>
+<div class="section" id="record-types">
+<h1>Record Types<a class="headerlink" href="#record-types" title="Permalink to this headline">¶</a></h1>
+<p>Records are defined within the <strong>softdev.models</strong> module. The following record types
+are currently supported:</p>
+<dl class="class">
+<dt id="softdev.models.Record">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Record</code><span class="sig-paren">(</span><em>name</em>, <em>desc=None</em>, <em>raw=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all record types. Do not use directly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name (str)</li>
+<li><strong>desc</strong> – Description (str)</li>
+<li><strong>raw</strong> – (bool) whether to use raw soft channel or soft channel</li>
+<li><strong>kwargs</strong> – additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.Enum">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Enum</code><span class="sig-paren">(</span><em>name</em>, <em>choices=None</em>, <em>default=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Enum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum record type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name (str)</li>
+<li><strong>choices</strong> – list/tuple of strings corresponding to the choice names, values will be 0-index integers</li>
+<li><strong>default</strong> – default value of the record, 0 by default</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.Toggle">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Toggle</code><span class="sig-paren">(</span><em>name</em>, <em>high=0.25</em>, <em>zname=None</em>, <em>oname=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Toggle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggle field corresponding to a binary out record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name (str)</li>
+<li><strong>high</strong> – Duration to keep high before returning to zero</li>
+<li><strong>zname</strong> – string value when zero</li>
+<li><strong>oname</strong> – string value when high</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.Integer">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Integer</code><span class="sig-paren">(</span><em>name</em>, <em>max_val=1000000</em>, <em>min_val=-1000000</em>, <em>default=0</em>, <em>units=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer Record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record Name.</li>
+<li><strong>max_val</strong> – Maximum value permitted (int), default (1e6)</li>
+<li><strong>min_val</strong> – Minimum value permitted (int), default (-1e6)</li>
+<li><strong>default</strong> – default value, default (0)</li>
+<li><strong>units</strong> – engineering units (str), default empty string</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.Float">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Float</code><span class="sig-paren">(</span><em>name</em>, <em>max_val=10000000000.0</em>, <em>min_val=-10000000000.0</em>, <em>default=0.0</em>, <em>prec=4</em>, <em>units=''</em>, <em>raw=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Float Record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record Name.</li>
+<li><strong>max_val</strong> – Maximum value permitted (float), default (1e6)</li>
+<li><strong>min_val</strong> – Minimum value permitted (float), default (-1e6)</li>
+<li><strong>default</strong> – default value, default (0.0)</li>
+<li><strong>prec</strong> – number of decimal places, default (4)</li>
+<li><strong>units</strong> – engineering units (str), default empty string</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.String">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">String</code><span class="sig-paren">(</span><em>name</em>, <em>max_length=20</em>, <em>default=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.String" title="Permalink to this definition">¶</a></dt>
+<dd><p>String record. Uses standard string record, or character array depending on length</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name (str)</li>
+<li><strong>max_length</strong> – maximum number of characters expected</li>
+<li><strong>default</strong> – default value, empty string by default</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.Array">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Array</code><span class="sig-paren">(</span><em>name</em>, <em>type=&lt;type 'int'&gt;</em>, <em>length=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array Record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record Name</li>
+<li><strong>type</strong> – Element type (str or python type), supported types are [‘STRING’, ‘SHORT’, ‘FLOAT’, int, str, float]</li>
+<li><strong>length</strong> – Number of elements in the array</li>
+<li><strong>kwargs</strong> – Extra kwargs</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.Calc">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Calc</code><span class="sig-paren">(</span><em>name</em>, <em>scan=0</em>, <em>prec=4</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc Record</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name</li>
+<li><strong>scan</strong> – scan parameter, default (0 ie passive)</li>
+<li><strong>prec</strong> – number of decimal places, default (4)</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.CalcOut">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">CalcOut</code><span class="sig-paren">(</span><em>name</em>, <em>out=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.CalcOut" title="Permalink to this definition">¶</a></dt>
+<dd><p>CalcOutput Record</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name</li>
+<li><strong>out</strong> – Output record</li>
+<li><strong>kwargs</strong> – Extra keyword arguments, supports Calc kwargs also.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>

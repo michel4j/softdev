@@ -10,7 +10,7 @@ from . import log
 import numpy
 from gi.repository import GObject
 
-# setup module logger with a default do-nothing handler
+# _setup module logger with a default do-nothing handler
 logger = log.get_module_logger(__name__)
 
 # Define EPICS constants

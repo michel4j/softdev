@@ -4,6 +4,7 @@ setup(
     name='python-softdev',
     version='0.2.0',
     packages=['softdev'],
+    scripts=['bin/softdev-startproject'],
     url='',
     license='MIT License',
     author='Michel Fodje',

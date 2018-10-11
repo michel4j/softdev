@@ -29,11 +29,10 @@ if __name__== '__main__':
         log.log_to_console(logging.DEBUG)
     else:
         log.log_to_console(logging.INFO)
-    try:
-        app = ioc.{app_name}('APP0000-01')  # initialize App
-        reactor.run()               # run main-loop
-    except KeyboardInterrupt:
-        app.shutdown()
+
+    app = ioc.{app_name}('APP0000-01')  # initialize App
+    reactor.addSystemEventTrigger('before', 'shutdown', app.shutdown) # make sure app is properly shutdown
+    reactor.run()               # run main-loop
 
 """
 
@@ -62,12 +61,18 @@ class {app_name}(object):
         self.ioc = {model_name}(device_name, callbacks=self)
     
     def do_toggle(self, pv, value, ioc):
-        print('Toggle Changed Value', pv, value, ioc)
-        ioc.enum.put((ioc.enum.get() + 1) % 3, wait=True)  # cycle through values
+        if value == 1:
+            # Command activated, value will return to 0 after some time 
+            print('Toggle Changed Value', pv, value, ioc)
+            ioc.enum.put((ioc.enum.get() + 1) % 3, wait=True)  # cycle through values
     
     def do_enum(self, pv, value, ioc):
         print('New Enum Value', value)
 
+    def shutdown(self):
+        # needed for proper IOC shutdown
+        self.ioc.shutdown()
+        
 """
 
 

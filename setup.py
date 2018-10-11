@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='python-softdev',
-    version='0.2.3',
+    version='0.2.4',
     packages=['softdev'],
     scripts=['bin/softdev-startproject'],
     url='',

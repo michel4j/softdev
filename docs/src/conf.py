@@ -152,7 +152,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'SoftDev', u'SoftDev Documentation',
-     author, 'SoftDev', 'One line description of project.',
+     author, 'SoftDev', 'Python Soft Device Support for EPICS',
      'Miscellaneous'),
 ]
 

@@ -38,7 +38,7 @@ The content of the example **ioc.py** file looks like
            desc='Calc Test'
        )
 
-      class MyIOCApp(object):
+   class MyIOCApp(object):
 
        def __init__(self, device_name):
            self.ioc = MyIOC(device_name, callbacks=self)

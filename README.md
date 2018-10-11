@@ -58,8 +58,7 @@ The content of the example **ioc.py** file looks like
        def shutdown(self):
            # needed for proper IOC shutdown
            self.ioc.shutdown()
-
-
+```
 
 The **runIOC.py** file looks like the following:
 
@@ -101,6 +100,6 @@ The **runIOC.py** file looks like the following:
 
        # run main-loop
        reactor.run()
-
+```
 
 See the more detailed documentation on how to use it.

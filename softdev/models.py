@@ -141,7 +141,7 @@ class String(Record):
         'VAL': '{default}'
     }
 
-    def __init__(self, name, max_length=20, default='', **kwargs):
+    def __init__(self, name, max_length=20, default=' ', **kwargs):
         """
         String record. Uses standard string record, or character array depending on length
 
@@ -165,6 +165,8 @@ class Integer(Record):
     fields = {
         'HOPR': '{max_val}',
         'LOPR': '{min_val}',
+        'DRVH': '{max_val}',
+        'DRVL': '{min_val}',
         'VAL': '{default}',
         'EGU': '{units}',
     }

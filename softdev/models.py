@@ -152,11 +152,11 @@ class String(Record):
         """
         kwargs.update(max_length=max_length, default=default)
         super(String, self).__init__(name, **kwargs)
-        if self.options['max_length'] > 20:
+        if self.options['max_length'] > 40:
             self.options['record'] = 'waveform'
             self.add_field('NELM', self.options['max_length'])
             self.add_field('FTVL', 'CHAR')
-            #self.del_field('VAL')
+            self.del_field('VAL')
 
 
 class Integer(Record):

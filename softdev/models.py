@@ -156,7 +156,7 @@ class String(Record):
             self.options['record'] = 'waveform'
             self.add_field('NELM', self.options['max_length'])
             self.add_field('FTVL', 'CHAR')
-            self.del_field('VAL')
+            #self.del_field('VAL')
 
 
 class Integer(Record):

@@ -408,8 +408,29 @@ are currently supported:</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="softdev.models.Binary">
-<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Binary</code><span class="sig-paren">(</span><em>name</em>, <em>default=0</em>, <em>out=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Binary" title="Permalink to this definition">¶</a></dt>
+<dt id="softdev.models.BinaryInput">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">BinaryInput</code><span class="sig-paren">(</span><em>name</em>, <em>default=0</em>, <em>inp=''</em>, <em>shift=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.BinaryInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary record type for converting between integers and bits</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name (str)</li>
+<li><strong>inp</strong> – Input link</li>
+<li><strong>shift</strong> – shift value by this number of bits to the right</li>
+<li><strong>default</strong> – default value of the record, 0 by default</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.BinaryOutput">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">BinaryOutput</code><span class="sig-paren">(</span><em>name</em>, <em>default=0</em>, <em>out=''</em>, <em>shift=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.BinaryOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary record type for converting between integers and bits</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -418,6 +439,8 @@ are currently supported:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> – Record name (str)</li>
 <li><strong>default</strong> – default value of the record, 0 by default</li>
+<li><strong>out</strong> – output link</li>
+<li><strong>shift</strong> – shift value by this number of bits to the right</li>
 <li><strong>kwargs</strong> – Extra keyword arguments</li>
 </ul>
 </td>

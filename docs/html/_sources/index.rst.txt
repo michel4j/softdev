@@ -213,7 +213,8 @@ are currently supported:
 
 .. autoclass:: Record
 .. autoclass:: Enum
-.. autoclass:: Binary
+.. autoclass:: BinaryInput
+.. autoclass:: BinaryOutput
 .. autoclass:: Toggle
 .. autoclass:: Integer
 .. autoclass:: Float

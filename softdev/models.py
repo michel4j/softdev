@@ -118,23 +118,48 @@ class Enum(Record):
             self.add_field('{}ST'.format(key), name)
 
 
-class Binary(Record):
+class BinaryOutput(Record):
     record = 'mbboDirect'
     fields = {
         'VAL': '{default}',
         'OUT': '{out}',
+        'SHFT': '{shift}',
     }
 
-    def __init__(self, name, default=0, out='', **kwargs):
+    def __init__(self, name, default=0, out='', shift=0, **kwargs):
         """
         Binary record type for converting between integers and bits
 
         :param name: Record name (str)
         :param default: default value of the record, 0 by default
+        :param out: output link
+        :param shift: shift value by this number of bits to the right
         :param kwargs: Extra keyword arguments
         """
-        kwargs.update(default=default, out=out)
-        super(Binary, self).__init__(name, **kwargs)
+        kwargs.update(default=default, out=out, shift=shift)
+        super(BinaryOutput, self).__init__(name, **kwargs)
+
+
+class BinaryInput(Record):
+    record = 'mbbiDirect'
+    fields = {
+        'VAL': '{default}',
+        'INP': '{inp}',
+        'SHFT': '{shift}',
+    }
+
+    def __init__(self, name, default=0, inp='', shift=0, **kwargs):
+        """
+        Binary record type for converting between integers and bits
+
+        :param name: Record name (str)
+        :param inp: Input link
+        :param shift: shift value by this number of bits to the right
+        :param default: default value of the record, 0 by default
+        :param kwargs: Extra keyword arguments
+        """
+        kwargs.update(default=default, inp=inp, shift=shift)
+        super(BinaryInput, self).__init__(name, **kwargs)
 
 
 class Toggle(Record):

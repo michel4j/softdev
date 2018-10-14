@@ -198,7 +198,7 @@ dependencies are available.</p>
 ├── bin
 │   ├── runIOC.py    # Command to run IOC Application
 │   └── runOpCtrl    # Command to run Operator Display Application
-├── op               # Directory containing Operator Display screens
+├── opi              # Directory containing Operator Display screens
 └── myioc            # Python package for your IOC Application and all other supporting modules
     ├── __init__.py
     └── ioc.py       # IOC module containing your IOC application
@@ -339,19 +339,21 @@ field.</p>
 <span class="kn">from</span> <span class="nn">softdev</span> <span class="kn">import</span> <span class="n">log</span>
 <span class="kn">from</span> <span class="nn">myioc</span> <span class="kn">import</span> <span class="n">ioc</span>
 
-<span class="c1"># Setup single argument for verbose logging</span>
+<span class="c1"># Setup command line arguments</span>
 <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run IOC Application&#39;</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Verbose Logging&#39;</span><span class="p">)</span>
-<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--device&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Device Name&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">v</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">log_to_console</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">log_to_console</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
     <span class="c1"># initialize App</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">ioc</span><span class="o">.</span><span class="n">MyIOCApp</span><span class="p">(</span><span class="s1">&#39;APP0000-01&#39;</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ioc</span><span class="o">.</span><span class="n">MyIOCApp</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># make sure app is properly shutdown</span>
     <span class="n">reactor</span><span class="o">.</span><span class="n">addSystemEventTrigger</span><span class="p">(</span><span class="s1">&#39;before&#39;</span><span class="p">,</span> <span class="s1">&#39;shutdown&#39;</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">shutdown</span><span class="p">)</span>
@@ -396,6 +398,25 @@ are currently supported:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> – Record name (str)</li>
 <li><strong>choices</strong> – list/tuple of strings corresponding to the choice names, values will be 0-index integers</li>
+<li><strong>default</strong> – default value of the record, 0 by default</li>
+<li><strong>kwargs</strong> – Extra keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="softdev.models.Binary">
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">Binary</code><span class="sig-paren">(</span><em>name</em>, <em>default=0</em>, <em>out=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.Binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary record type for converting between integers and bits</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Record name (str)</li>
 <li><strong>default</strong> – default value of the record, 0 by default</li>
 <li><strong>kwargs</strong> – Extra keyword arguments</li>
 </ul>
@@ -473,7 +494,7 @@ are currently supported:</p>
 
 <dl class="class">
 <dt id="softdev.models.String">
-<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">String</code><span class="sig-paren">(</span><em>name</em>, <em>max_length=20</em>, <em>default=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.String" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">softdev.models.</code><code class="descname">String</code><span class="sig-paren">(</span><em>name</em>, <em>max_length=20</em>, <em>default=' '</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#softdev.models.String" title="Permalink to this definition">¶</a></dt>
 <dd><p>String record. Uses standard string record, or character array depending on length</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

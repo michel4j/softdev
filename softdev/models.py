@@ -118,6 +118,25 @@ class Enum(Record):
             self.add_field('{}ST'.format(key), name)
 
 
+class Binary(Record):
+    record = 'mbboDirect'
+    fields = {
+        'VAL': '{default}',
+        'OUT': '{out}',
+    }
+
+    def __init__(self, name, default=0, out='', **kwargs):
+        """
+        Binary record type for converting between integers and bits
+
+        :param name: Record name (str)
+        :param default: default value of the record, 0 by default
+        :param kwargs: Extra keyword arguments
+        """
+        kwargs.update(default=default, out=out)
+        super(Binary, self).__init__(name, **kwargs)
+
+
 class Toggle(Record):
     record = 'bo'
     fields = {

@@ -56,7 +56,7 @@ Your IOC application can be structured at will although we recommend the followi
    ├── bin
    │   ├── runIOC.py    # Command to run IOC Application
    │   └── runOpCtrl    # Command to run Operator Display Application
-   ├── op               # Directory containing Operator Display screens
+   ├── opi              # Directory containing Operator Display screens
    └── myioc            # Python package for your IOC Application and all other supporting modules
        ├── __init__.py
        └── ioc.py       # IOC module containing your IOC application
@@ -178,19 +178,21 @@ The script **bin/runIOC.py** is responsible for running the IOC Application. An 
    from softdev import log
    from myioc import ioc
 
-   # Setup single argument for verbose logging
+   # Setup command line arguments
    parser = argparse.ArgumentParser(description='Run IOC Application')
    parser.add_argument('-v', action='store_true', help='Verbose Logging')
-   args = parser.parse_args()
+   parser.add_argument('--device', type=str, help='Device Name', required=True)
+
 
    if __name__== '__main__':
+       args = parser.parse_args()
        if args.v:
            log.log_to_console(logging.DEBUG)
        else:
            log.log_to_console(logging.INFO)
 
        # initialize App
-       app = ioc.MyIOCApp('APP0000-01')
+       app = ioc.MyIOCApp(args.device)
 
        # make sure app is properly shutdown
        reactor.addSystemEventTrigger('before', 'shutdown', app.shutdown)

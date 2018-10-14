@@ -34,7 +34,7 @@ parser.add_argument('--device', type=str, help='Device Name', required=True)
 # Example of how to start your APP. Modify as needed
 
 if __name__== '__main__':
-    args = parse.parse_args()
+    args = parser.parse_args()
     if args.v:
         log.log_to_console(logging.DEBUG)
     else:
@@ -184,7 +184,7 @@ A python based Soft IOC Server.
 
 Usage
 =====
-In order to use {project_name}, you need have a functioning install of python-softdev and its requirements and procServ.
+In order to use "{project_name}", you need have a functioning install of python-softdev and its requirements and procServ.
  
 1. Create a directory for the IOC instance. The directory should be named exactly like the device name but the location
    is irelevant. 
@@ -220,13 +220,13 @@ def startproject(name):
     app_name = '{}App'.format(model_name)
 
     bin_file = os.path.join(bin_dir, 'runIOC.py')
-    init_file = os.path.join(deploy_dir, 'init-template')
+    initd_file = os.path.join(deploy_dir, 'init-template')
     readme_file = os.path.join(project_dir, 'README.md')
 
     with open(bin_file, 'w') as handle:
         handle.write(RUNIOC_TMPL.format(project_name=name, app_name=app_name))
 
-    with open(bin_file, 'w') as handle:
+    with open(initd_file, 'w') as handle:
         handle.write(INIT_TMPL)
 
     with open(readme_file, 'w') as handle:
@@ -234,7 +234,7 @@ def startproject(name):
 
     # make file executable
     os.chmod(bin_file, 0755)
-    os.chmod(init_file, 0755)
+    os.chmod(initd_file, 0755)
 
     ioc_file = os.path.join(ioc_dir, 'ioc.py')
     init_file = os.path.join(ioc_dir, '__init__.py')

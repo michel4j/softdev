@@ -6,7 +6,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), 'r') as 
 
 setup(
     name='python-softdev',
-    version='0.2.9',
+    version='0.2.10',
     packages=['softdev'],
     scripts=['bin/softdev-startproject'],
     url='',

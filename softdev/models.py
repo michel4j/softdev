@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import time
+from enum import Enum
 
 from . import epics, log
 
@@ -104,10 +105,17 @@ class Enum(Record):
         """
         kwargs.update(choices=choices, default=default)
         super(Enum, self).__init__(name, **kwargs)
-        if isinstance(self.options['choices'], collections.Iterable):
-            for i, (key, name) in enumerate(zip(ENUM_KEYS, self.options['choices'])):
-                self.add_field('{}VL'.format(key), "{}".format(i))
-                self.add_field('{}ST'.format(key), name)
+        if isinstance(self.options['choices'], Enum):
+            choice_pairs = [(e.name, e.value) for e in self.options['choices']]
+        elif isinstance(self.options['choices'], collections.Iterable):
+            choice_pairs = [(c, i) for i, c in enumerate(self.options['choices'])]
+        else:
+            choice_pairs = []
+        for i in range(len(choice_pairs)):
+            name, value = choice_pairs[i]
+            key = ENUM_KEYS[i]
+            self.add_field('{}VL'.format(key), "{}".format(value))
+            self.add_field('{}ST'.format(key), name)
 
 
 class Toggle(Record):

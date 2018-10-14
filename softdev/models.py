@@ -4,7 +4,7 @@ import os
 import shutil
 import subprocess
 import time
-from enum import Enum
+from enum import EnumMeta
 
 from . import epics, log
 
@@ -105,7 +105,7 @@ class Enum(Record):
         """
         kwargs.update(choices=choices, default=default)
         super(Enum, self).__init__(name, **kwargs)
-        if isinstance(self.options['choices'], Enum):
+        if isinstance(self.options['choices'], EnumMeta):
             choice_pairs = [(e.name, e.value) for e in self.options['choices']]
         elif isinstance(self.options['choices'], collections.Iterable):
             choice_pairs = [(c, i) for i, c in enumerate(self.options['choices'])]

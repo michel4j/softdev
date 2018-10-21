@@ -208,7 +208,7 @@ class BasePV(GObject.GObject):
         'alarm': (GObject.SignalFlags.RUN_FIRST, None, (object,))
     }
 
-    def __init__(self, name, monitor=True, timed=False):
+    def __init__(self, name, monitor=True):
         GObject.GObject.__init__(self)
 
     def set_state(self, **kwargs):
@@ -268,14 +268,21 @@ class PV(BasePV):
     useful with the PV.
     """
 
-    def __init__(self, name, monitor=True, timed=False, connect=False):
-        super(PV, self).__init__(name, monitor=monitor, timed=timed)
+    def __init__(self, name, monitor=True, connect=False, ignore_first=False):
+        """
+        Process Variable Object
+        :param name: PV name
+        :param monitor: boolean, whether to enable monitoring of changes and emitting of change signals
+        :param connect:  boolean, connect immediately. No deferred connection
+        :param ignore_first: Do not emit signals for the very first value, since it doesn't actually represent a change
+        """
+        super(PV, self).__init__(name, monitor=monitor)
 
         self.state_info = {'active': False, 'changed': 0, 'time': 0, 'alarm': (0, 0)}
         self._dev_state_patt = re.compile('^(\w+)_state$')
         self.name = name
         self.monitor = monitor
-        self.time_changes = timed
+        self.ignore_next_change = ignore_first
         self.connected = CA_OP_CONN_DOWN
         self.value = None
         self.time = 0.0
@@ -367,12 +374,13 @@ class PV(BasePV):
                     params[_k] = v
             return params
 
-    def put(self, val, wait=False):
+    def put(self, val, wait=False, ignore=False):
         """
         Set the value of the process variable, waiting for up to 0.05 sec until
         the put is complete.
         :param val: Value to Put
-        :param flush: boolean, if True, flush the channel before returning
+        :param wait: boolean, if True, flush the channel before returning
+        :param ignore: boolean, do not emit a changed signal for this change
         :return:
         """
 
@@ -380,6 +388,7 @@ class PV(BasePV):
             logger.error('(%s) PV not connected' % (self.name,))
             return
 
+        self.ignore_next_change = ignore
         data = self.from_python(val)
         libca.ca_array_put(self.type, self.count, self.chid, byref(data))
         libca.ca_pend_io(0.05)
@@ -469,8 +478,13 @@ class PV(BasePV):
         self.dbr = dbr
         self.value = self.to_python(dbr.contents, event.type)
         self.time = epics_to_posixtime(dbr.contents.stamp)
-        self.set_state(time=self.time)
-        self.set_state(changed=self.value)
+
+        # do not send signals if change was suspended during put
+        if self.ignore_next_change:
+            self.ignore_next_change = False
+        else:
+            self.set_state(time=self.time)
+            self.set_state(changed=self.value)
 
         _alm, _sev = dbr.contents.status, dbr.contents.severity
         if (_alm, _sev) != (self.alarm, self.severity):

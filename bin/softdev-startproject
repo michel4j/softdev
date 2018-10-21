@@ -1,4 +1,4 @@
-#!/usr/bin/env  python
+#!/usr/bin/env  python2
 
 import os
 import errno
@@ -10,7 +10,7 @@ def slugify(text):
     return re.sub(r'[^a-z0-9]+', '', str(text))
 
 
-RUNIOC_TMPL = """#!/usr/bin/env python
+RUNIOC_TMPL = """#!/usr/bin/env python2
 import os
 import logging
 import sys

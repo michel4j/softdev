@@ -374,13 +374,14 @@ class PV(BasePV):
                     params[_k] = v
             return params
 
-    def put(self, val, wait=False, ignore=False):
+    def put(self, val, wait=False, ignore=False, soft=False):
         """
         Set the value of the process variable, waiting for up to 0.05 sec until
         the put is complete.
         :param val: Value to Put
         :param wait: boolean, if True, flush the channel before returning
         :param ignore: boolean, do not emit a changed signal for this change
+        :param soft: boolean, if True, do not put if current value is the same as val
         :return:
         """
 
@@ -389,12 +390,13 @@ class PV(BasePV):
             return
 
         self.ignore_next_change = ignore
-        data = self.from_python(val)
-        libca.ca_array_put(self.type, self.count, self.chid, byref(data))
-        libca.ca_pend_io(0.05)
-        libca.ca_pend_event(1e-4)
-        if wait:
-            flush()
+        if not (soft and self.value == val):
+            data = self.from_python(val)
+            libca.ca_array_put(self.type, self.count, self.chid, byref(data))
+            libca.ca_pend_io(0.05)
+            libca.ca_pend_event(1e-4)
+            if wait:
+                flush()
 
     # provide a put method for those used to EPICS terminology
     set = put

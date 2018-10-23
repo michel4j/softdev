@@ -398,6 +398,7 @@ class Model(object):
         self.command = command
         self.ready = False
         self.db_cache_dir = os.path.join(os.path.join(os.getcwd(), '__dbcache__'))
+        self.directory = os.getcwd()
         self._startup()
         self._setup()
 

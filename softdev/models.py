@@ -223,13 +223,13 @@ class Integer(Record):
         'EGU': '{units}',
     }
 
-    def __init__(self, name, max_val=1000000, min_val=-1000000, default=0, units='', **kwargs):
+    def __init__(self, name, max_val=0, min_val=0, default=0, units='', **kwargs):
         """
         Integer Record.
 
         :param name: Record Name.
-        :param max_val: Maximum value permitted (int), default (1e6)
-        :param min_val: Minimum value permitted (int), default (-1e6)
+        :param max_val: Maximum value permitted (int), default (no limit)
+        :param min_val: Minimum value permitted (int), default (no limit)
         :param default: default value, default (0)
         :param units:  engineering units (str), default empty string
         :param kwargs: Extra keyword arguments
@@ -251,13 +251,13 @@ class Float(Record):
         'VAL': '{default}'
     }
 
-    def __init__(self, name, max_val=1e10, min_val=-1e10, default=0.0, prec=4, units='', **kwargs):
+    def __init__(self, name, max_val=0, min_val=0, default=0.0, prec=4, units='', **kwargs):
         """
         Float Record.
 
         :param name: Record Name.
-        :param max_val: Maximum value permitted (float), default (1e6)
-        :param min_val: Minimum value permitted (float), default (-1e6)
+        :param max_val: Maximum value permitted (float), default (no limit)
+        :param min_val: Minimum value permitted (float), default (no limit)
         :param default: default value, default (0.0)
         :param prec: number of decimal places, default (4)
         :param units:  engineering units (str), default empty string
